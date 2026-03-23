@@ -4,7 +4,8 @@ import SummaryTabs from '@/components/SummaryTabs';
 import ChatBox from '@/components/ChatBox';
 import QuizList from '@/components/QuizList';
 import { redirect } from 'next/navigation';
-import { BookOpen, HelpCircle, FileText } from 'lucide-react';
+import { BookOpen, HelpCircle, FileText, Sparkles } from 'lucide-react';
+import MagneticSummary from '@/components/MagneticSummary';
 
 export default async function VideoPage({ params }: { params: { id: string } }) {
     const supabase = await createClient();
@@ -49,12 +50,16 @@ export default async function VideoPage({ params }: { params: { id: string } }) 
                             />
                         </div>
 
+                        <section id="magnetic-summary" className="scroll-mt-24">
+                            <MagneticSummary content={summaryData.short_summary} />
+                        </section>
+
                         <section id="summary" className="scroll-mt-24">
                             <div className="flex items-center gap-3 mb-6">
-                                <div className="p-3 bg-blue-500/10 rounded-2xl border border-blue-500/20">
-                                    <FileText className="text-blue-500" size={24} />
+                                <div className="p-3 bg-blue-500/10 rounded-2xl border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+                                    <FileText className="text-blue-400" size={24} />
                                 </div>
-                                <h2 className="text-3xl font-bold">AI Analysis</h2>
+                                <h2 className="text-3xl font-bold tracking-tight">AI Insights</h2>
                             </div>
                             <SummaryTabs summary={summaryData} />
                         </section>

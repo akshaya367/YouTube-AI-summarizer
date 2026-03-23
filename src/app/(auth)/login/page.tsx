@@ -1,7 +1,6 @@
-import { headers } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { Github, Mail } from 'lucide-react'; // Can swap github for google
+import { Github, Mail, Chrome } from 'lucide-react';
 
 export default async function Login({
     searchParams,
@@ -28,7 +27,6 @@ export default async function Login({
 
     const signUp = async (formData: FormData) => {
         'use server';
-        const origin = (await headers()).get('origin');
         const email = formData.get('email') as string;
         const password = formData.get('password') as string;
         const supabase = await createClient();
@@ -37,7 +35,7 @@ export default async function Login({
             email,
             password,
             options: {
-                emailRedirectTo: `${origin}/auth/callback`,
+                emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/callback`,
             },
         });
 
@@ -48,68 +46,94 @@ export default async function Login({
         return redirect('/login?message=Check email to continue sign in process');
     };
 
-    // Google OAuth would require enabling it in Supabase Dashboard and calling auth.signInWithOAuth
+    const signInWithProvider = async (formData: FormData) => {
+        'use server';
+        const provider = formData.get('provider') as 'google' | 'github';
+        const supabase = await createClient();
+
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider,
+            options: {
+                redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/callback`,
+            },
+        });
+
+        if (error) {
+            return redirect('/login?message=OAuth error');
+        }
+
+        return redirect(data.url);
+    };
 
     return (
-        <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2 mt-20 mx-auto">
-            <div className="bg-gray-900 border border-gray-800 p-8 rounded-2xl shadow-xl">
-                <h1 className="text-2xl font-bold mb-6 text-center">Welcome Back</h1>
+        <div className="min-h-screen flex items-center justify-center bg-black bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/10 via-black to-black px-6">
+            <div className="w-full max-w-md bg-white/[0.03] border border-white/10 p-10 rounded-[32px] backdrop-blur-3xl shadow-2xl">
+                <div className="text-center mb-10">
+                    <h1 className="text-4xl font-black mb-3 text-white tracking-tight">Welcome</h1>
+                    <p className="text-gray-400 font-medium">Log in to your elite knowledge assistant</p>
+                </div>
 
-                <form
-                    className="flex-1 flex flex-col w-full justify-center gap-4 text-gray-300"
-                    action={signIn}
-                >
-                    <div className="space-y-4">
-                        <div>
-                            <label className="text-sm font-medium mb-1.5 block" htmlFor="email">
-                                Email
-                            </label>
-                            <input
-                                className="w-full rounded-xl bg-gray-800 border border-gray-700 px-4 py-3 mb-2 focus:ring-2 focus:ring-blue-500 outline-none"
-                                name="email"
-                                placeholder="you@example.com"
-                                required
-                            />
-                        </div>
+                <div className="grid grid-cols-2 gap-4 mb-8">
+                    <form action={signInWithProvider}>
+                        <input type="hidden" name="provider" value="google" />
+                        <button className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold py-3.5 rounded-2xl transition-all group">
+                            <Chrome size={20} className="group-hover:scale-110 transition-transform" />
+                            Google
+                        </button>
+                    </form>
+                    <form action={signInWithProvider}>
+                        <input type="hidden" name="provider" value="github" />
+                        <button className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold py-3.5 rounded-2xl transition-all group">
+                            <Github size={20} className="group-hover:scale-110 transition-transform" />
+                            GitHub
+                        </button>
+                    </form>
+                </div>
 
-                        <div>
-                            <label className="text-sm font-medium mb-1.5 block" htmlFor="password">
-                                Password
-                            </label>
-                            <input
-                                className="w-full rounded-xl bg-gray-800 border border-gray-700 px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none"
-                                type="password"
-                                name="password"
-                                placeholder="••••••••"
-                                required
-                            />
-                        </div>
+                <div className="relative mb-8">
+                    <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-white/5"></div>
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase tracking-widest font-bold">
+                        <span className="px-4 bg-black text-gray-500">Or email</span>
+                    </div>
+                </div>
+
+                <form className="space-y-4" action={signIn}>
+                    <div className="space-y-3">
+                        <input
+                            className="w-full rounded-2xl bg-white/5 border border-white/10 px-5 py-4 text-white placeholder-gray-500 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-medium"
+                            name="email"
+                            type="email"
+                            placeholder="Email address"
+                            required
+                        />
+                        <input
+                            className="w-full rounded-2xl bg-white/5 border border-white/10 px-5 py-4 text-white placeholder-gray-500 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-medium"
+                            type="password"
+                            name="password"
+                            placeholder="Password"
+                            required
+                        />
                     </div>
 
-                    <button className="bg-blue-600 hover:bg-blue-700 font-semibold text-white px-4 py-3 rounded-xl transition-colors w-full mt-2">
+                    <button className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-500/20 transition-all active:scale-95 mt-4">
                         Sign In
                     </button>
 
-                    <div className="relative my-4">
-                        <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-gray-700"></div>
-                        </div>
-                        <div className="relative flex justify-center text-sm">
-                            <span className="px-2 bg-gray-900 text-gray-400">Or continue with</span>
-                        </div>
-                    </div>
-
                     <button
                         formAction={signUp}
-                        className="border border-gray-700 bg-gray-800 hover:bg-gray-700 font-semibold px-4 py-3 rounded-xl transition-colors w-full flex justify-center items-center gap-2"
+                        className="w-full text-gray-400 hover:text-white font-semibold py-2 transition-colors text-sm"
                     >
-                        Create an Account
+                        Create new account
                     </button>
 
                     {searchParams?.message && (
-                        <p className="mt-4 p-4 bg-red-900/20 text-red-400 border border-red-900/50 rounded-xl text-center text-sm">
-                            {searchParams.message}
-                        </p>
+                        <div className="mt-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl">
+                            <p className="text-red-400 text-sm text-center font-medium">
+                                {searchParams.message}
+                            </p>
+                        </div>
                     )}
                 </form>
             </div>

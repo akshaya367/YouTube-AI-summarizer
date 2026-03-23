@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { YoutubeTranscript } from 'youtube-transcript';
 import { createClient } from '@/lib/supabase/server';
 import { generateAllContent } from '@/lib/ai';
+import FirecrawlApp from '@mendable/firecrawl-js';
 
 export async function POST(req: Request) {
     try {
@@ -20,19 +21,39 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Invalid YouTube URL' }, { status: 400 });
         }
 
-        let transcriptData;
+        // Firecrawl Scrape for more context (Description, Metadata, Comments)
+        let firecrawlContext = '';
+        let videoTitle = 'YouTube Video Analysis';
         try {
-            transcriptData = await YoutubeTranscript.fetchTranscript(videoId);
+            const firecrawl = new FirecrawlApp({ apiKey: process.env.FIRECRAWL_API_KEY });
+            const scrapeResponse = await (firecrawl as any).scrape(url, {
+                formats: ['markdown'],
+            });
+            if (scrapeResponse.success) {
+                firecrawlContext = scrapeResponse.markdown || '';
+                if ((scrapeResponse as any).metadata?.title) {
+                    videoTitle = (scrapeResponse as any).metadata.title.replace(' - YouTube', '');
+                }
+            }
         } catch (err) {
-            return NextResponse.json({ error: 'Subtitles are disabled for this video.' }, { status: 400 });
+            console.error('Firecrawl failed to scrape context:', err);
         }
 
-        const transcriptText = transcriptData.map((item) => item.text).join(' ');
+        let transcriptText = '';
+        try {
+            const transcriptData = await YoutubeTranscript.fetchTranscript(videoId);
+            transcriptText = transcriptData.map((item) => item.text).join(' ');
+        } catch (err) {
+            console.warn('Transcript fetching failed, relying on context only.');
+            if (!firecrawlContext) {
+                return NextResponse.json({ error: 'Subtitles are disabled and context scraping failed. Try another video.' }, { status: 400 });
+            }
+        }
 
-        const videoTitle = 'YouTube Video';
         const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
 
-        const generatedContent = await generateAllContent(transcriptText);
+        // Use Firecrawl context + Transcript (if any)
+        const generatedContent = await generateAllContent(transcriptText, firecrawlContext);
 
         const { data: videoData, error: videoError } = await supabase
             .from('videos')
