@@ -1,12 +1,12 @@
 import { updateSession } from '@/lib/supabase/middleware';
 import { type NextRequest, NextResponse } from 'next/server';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     try {
         const res = await updateSession(request);
         return res;
     } catch (e) {
-        console.error('Middleware Error:', e);
+        console.error('Proxy Error:', e);
         return NextResponse.next({
             request: {
                 headers: request.headers,
