@@ -66,72 +66,86 @@ export default async function Login({
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-black bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/10 via-black to-black px-6">
-            <div className="w-full max-w-md bg-white/[0.03] border border-white/10 p-10 rounded-[32px] backdrop-blur-3xl shadow-2xl">
-                <div className="text-center mb-10">
-                    <h1 className="text-4xl font-black mb-3 text-white tracking-tight">Welcome</h1>
-                    <p className="text-gray-400 font-medium">Log in to your elite knowledge assistant</p>
+        <div className="min-h-screen flex items-center justify-center bg-black relative overflow-hidden px-6">
+            {/* Animated Background Mesh */}
+            <div className="absolute top-0 left-0 w-full h-full point-events-none">
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/20 blur-[120px] rounded-full animate-float-slow" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-600/20 blur-[120px] rounded-full animate-float" />
+                <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] bg-purple-600/10 blur-[100px] rounded-full animate-pulse" />
+            </div>
+
+            <div className="w-full max-w-md bg-white/[0.03] border border-white/10 p-12 rounded-[40px] backdrop-blur-3xl shadow-2xl relative z-10">
+                <div className="text-center mb-12">
+                    <div className="w-16 h-16 bg-blue-600/20 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-blue-600/30">
+                        <Mail className="text-blue-400" size={32} />
+                    </div>
+                    <h1 className="text-5xl font-black mb-4 text-white tracking-tighter leading-none">Elevate.</h1>
+                    <p className="text-gray-400 font-medium text-lg leading-snug">Sign in to your elite AI knowledge workspace</p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mb-8">
+                <div className="grid grid-cols-2 gap-4 mb-10">
                     <form action={signInWithProvider}>
                         <input type="hidden" name="provider" value="google" />
-                        <button className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold py-3.5 rounded-2xl transition-all group">
-                            <Chrome size={20} className="group-hover:scale-110 transition-transform" />
+                        <button className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-4 rounded-[20px] transition-all group active:scale-95 shadow-lg">
+                            <Chrome size={22} className="group-hover:rotate-12 transition-transform" />
                             Google
                         </button>
                     </form>
                     <form action={signInWithProvider}>
                         <input type="hidden" name="provider" value="github" />
-                        <button className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold py-3.5 rounded-2xl transition-all group">
-                            <Github size={20} className="group-hover:scale-110 transition-transform" />
+                        <button className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-4 rounded-[20px] transition-all group active:scale-95 shadow-lg">
+                            <Github size={22} className="group-hover:scale-110 transition-transform" />
                             GitHub
                         </button>
                     </form>
                 </div>
 
-                <div className="relative mb-8">
+                <div className="relative mb-10">
                     <div className="absolute inset-0 flex items-center">
                         <div className="w-full border-t border-white/5"></div>
                     </div>
-                    <div className="relative flex justify-center text-xs uppercase tracking-widest font-bold">
-                        <span className="px-4 bg-black text-gray-500">Or email</span>
+                    <div className="relative flex justify-center text-xs uppercase tracking-[0.2em] font-black">
+                        <span className="px-6 bg-transparent text-gray-500">OR MASTER VIA EMAIL</span>
                     </div>
                 </div>
 
-                <form className="space-y-4" action={signIn}>
-                    <div className="space-y-3">
-                        <input
-                            className="w-full rounded-2xl bg-white/5 border border-white/10 px-5 py-4 text-white placeholder-gray-500 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-medium"
-                            name="email"
-                            type="email"
-                            placeholder="Email address"
-                            required
-                        />
-                        <input
-                            className="w-full rounded-2xl bg-white/5 border border-white/10 px-5 py-4 text-white placeholder-gray-500 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-medium"
-                            type="password"
-                            name="password"
-                            placeholder="Password"
-                            required
-                        />
+                <form className="space-y-5" action={signIn}>
+                    <div className="space-y-4">
+                        <div className="relative">
+                            <input
+                                className="w-full rounded-[20px] bg-white/5 border border-white/10 px-6 py-5 text-white placeholder-gray-600 outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all font-bold text-lg"
+                                name="email"
+                                type="email"
+                                placeholder="Email address"
+                                required
+                            />
+                        </div>
+                        <div className="relative">
+                            <input
+                                className="w-full rounded-[20px] bg-white/5 border border-white/10 px-6 py-5 text-white placeholder-gray-600 outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all font-bold text-lg"
+                                type="password"
+                                name="password"
+                                placeholder="Password"
+                                required
+                            />
+                        </div>
                     </div>
 
-                    <button className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-500/20 transition-all active:scale-95 mt-4">
-                        Sign In
+                    <button className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-5 rounded-[22px] shadow-2xl shadow-blue-600/40 transition-all active:scale-95 mt-6 text-xl tracking-tight">
+                        UNLEASH AI
                     </button>
 
                     <button
                         formAction={signUp}
-                        className="w-full text-gray-400 hover:text-white font-semibold py-2 transition-colors text-sm"
+                        className="w-full text-gray-500 hover:text-white font-bold py-2 transition-colors text-sm tracking-widest uppercase"
                     >
-                        Create new account
+                        Create New Workspace
                     </button>
 
                     {searchParams?.message && (
-                        <div className="mt-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl">
-                            <p className="text-red-400 text-sm text-center font-medium">
-                                {searchParams.message}
+                        <div className="mt-8 p-5 bg-red-500/10 border border-red-500/20 rounded-[24px] animate-shake">
+                            <p className="text-red-400 text-sm text-center font-black">
+                                {searchParams.message.toUpperCase()}
                             </p>
                         </div>
                     )}
