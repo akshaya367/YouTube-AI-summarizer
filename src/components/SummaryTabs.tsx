@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Download, Copy, Check, Share2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface SummaryTabsProps {
     summary: {
